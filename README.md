@@ -1,3 +1,13 @@
-# chat-web-rtc
-#Vietnamese
-Project chat viết bằng node js start day : 13/04/2018
+#language : vietnamese 
+
+# demoNode JS sử dụng socket.io để chat
+
+# start : node index
+
+# http://localhost:3000 nhiều tab đê chat vs nhau :D
+
+
+
+
+
+

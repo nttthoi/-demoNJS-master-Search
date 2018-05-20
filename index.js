@@ -11,7 +11,7 @@ app.get('/', function(req, res, next) {
     res.sendFile(__dirname + '/index.html');
 });
 var listUser = [];
-
+///
 var listObjUser = [];
 
 
@@ -85,7 +85,7 @@ io.on('connection', function(client) {
 
 
     client.on('send-msg-from-client-to', function(id, msg) {
-        io.sockets.in(id).emit("respone-msg-from-server-to-client",
+        io.sockets.in(id).emit("response-msg-from-server-to-client",
             client.id, msg);
     });
 

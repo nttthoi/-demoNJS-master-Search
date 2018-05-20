@@ -98,7 +98,7 @@
                     </span>
                 </div>
                 <div class="col-md-7">
-                    <input type="text" placeholder="Email" class="width-100 txtEmail">
+                    <input type="text" placeholder=" YourName or Email " class="width-100 txtEmail">
                 </div>
                 <div class="col-md-2">
                     <input type="button" value="Connect" class="btn_connect">
@@ -112,6 +112,8 @@
 </html>
 <script>
     var _thisId = "";
+    var _thisName = "";
+
     var _tongSoBanDangChat = 0;
 
     var _mang_BanDangChat = [];
@@ -128,25 +130,41 @@
 
     $(document).ready(function() {
 
-
         socket.on('broad', function(data) {
             $("#h_Name").html("Id của bạn là: " + data);
             _thisId = data;
         });
-
+        //điều khiển xuống thanh cuộn khung chát nhóm
         $("#content_chat_group").animate({
             scrollTop: $("#content_chat_group")[0].scrollHeight
         }, "fast");
 
     });
+    // enter mail
+    $(".txtEmail").keyup(function(e) {
+
+        var code = e.which; // recommended to use e.which, it's normalized across browsers
+
+        if (code == 13) {
+
+            var element = $(e.target);
+            var parent = element.closest(".div-connect");
+            var emailInput = parent.find(".txtEmail");
+            socket.emit('submit_Email', emailInput.val());
+            $("#h_Name").prepend("Chào: " + "<b><mark>" + emailInput.val() + "</mark></b>" + "<br>");
+            _thisName = emailInput.val();
+        }
+    });
 
 
+    // click connet mail
     $(".btn_connect").click((e) => {
         var element = $(e.currentTarget);
         var parent = element.closest(".div-connect");
         var emailInput = parent.find(".txtEmail");
         socket.emit('submit_Email', emailInput.val());
         $("#h_Name").prepend("Chào: " + "<b><mark>" + emailInput.val() + "</mark></b>" + "<br>");
+        _thisName = emailInput.val();
     });
 
     socket.on('resendEmailToClient', function(listObjUser) {
@@ -201,7 +219,7 @@
         }, "fast");
     });
 
-    socket.on('respone-msg-from-server-to-client', function(id, msg) {
+    socket.on('response-msg-from-server-to-client', function(id, msg) {
         console.log(id + ": " + msg);
         XuLyMangDangChat(id);
         XuLyAnHienDivChat(id);
@@ -216,7 +234,7 @@
     //end socket io
 
 
-    // jquery 
+    // jquery khung chat nhóm
     $('form').submit(function(e) {
         e.preventDefault();
         console.log("this=" + _thisId);
@@ -243,7 +261,7 @@
             });
         }
     }
-
+    //sử lý click vào
     function fnChatWithFriend(ev) {
         var id = $(ev).attr("data-id");
         if (_mang_BanDangChat_Tong.length < 1) {
@@ -283,13 +301,15 @@
             }
         }
     }
-
+    //khởi động nhắn tin với người khác, ẩn hiện
     function
     XuLyAnHienDivChat(id) {
         for (var i = 0; i < _mang_BanDangChat.length; i++) {
             var stt = i + 1;
             $(".form_chat_" + stt).removeClass("hidden").addClass("show");
             $(".form_chat_" + stt + " " + ".tieu_de").html(_mang_BanDangChat[i]);
+            // $(".form_chat_" + stt + " " + ".tieu_de").html(_thisName);
+
             $(".form_chat_" + stt).attr("data-id", _mang_BanDangChat[i]);
             if (_mang_BanDangChat[i] == id) {
                 $(".form_chat_" + stt + " " + ".tieu_de").removeClass("tieu_de_normal").addClass("tieu_de_active");
@@ -300,7 +320,7 @@
                 $(".form_chat_" + stt + " " + ".tieu_de").removeClass("tieu_de_active").addClass("tieu_de_normal");
         }
     }
-
+    // click vào gửi tin nhắn
     function chat_mat_click(ev) {
         var id = $(ev).closest(".form_chat").attr("data-id");
         var message = $(ev).parent().find("textarea").val();
@@ -316,7 +336,7 @@
         socket.emit('send-msg-from-client-to', id, message);
         // socket.emit()
     }
-
+    // bắt sự kiện enter để gửi tin nhắn
     $(".txtMsg")
         .keypress(function(ev) {
             if (ev.keyCode == 13) {
@@ -333,6 +353,7 @@
             }
         });
 
+    // thêm tin nhắn 
 
     function appendMsg(message, div_appendTo, class_style) {
         $('<div/>') // create div 
@@ -356,8 +377,7 @@
     // jquery
 
 
-
-    //jquery event
+    //jquery event phóng to và thu nhỏ tiêu đề thanh tin nhắn 
     $(".tieu_de").click(function(ev) {
             if ($(this).closest(".form_chat").find(".content-tin-nhan").hasClass("hien-div-chat")) {
                 $(this).closest(".form_chat")
